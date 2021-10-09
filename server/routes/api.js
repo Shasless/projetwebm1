@@ -34,7 +34,7 @@ router.get('/articles', async (req, res) => {
             "(SELECT username FROM users WHERE id = articles.owner) as owner, " +
             "title, " +
             "(SELECT display_name FROM games WHERE id = articles.game) as game, " +
-            "content, price, run_link, cover FROM articles "
+            "content, price, article_link, cover FROM articles "
   switch (req.query.order_by) {
     case 'game':
       const game = sanitizeGameName(req.query.game);
@@ -69,6 +69,21 @@ router.get('/articles', async (req, res) => {
   res.status(200).json(result)
 })
 
+router.get('/basket', async (req, res) => {
+  try {
+    const id = req.query.id;
+    const sql = ""; // add querry
+    const result = (await client.query({
+      text: sql,
+      values: [id]
+    })).rows;
+    res.status(200).json(result);
+  } catch (e) {
+    res.status(400)
+  }
+})
+
+
 /**
  * Cette route permet de récupérer un article particulier en fonction de son id
  * Doit recevoir l'id en paramètre
@@ -80,7 +95,7 @@ router.get('/articles/byid', async (req, res) => {
         "(SELECT username FROM users WHERE id = articles.owner) as owner, " +
         "title, " +
         "(SELECT display_name FROM games WHERE id = articles.game) as game, " +
-        "content, price, run_link, cover " +
+        "content, price, article_link, cover " +
         "FROM articles WHERE id = $1";
     const result = (await client.query({
       text: sql,
@@ -102,7 +117,7 @@ router.get('/articles/byuser', async (req, res) => {
         "(SELECT username FROM users WHERE id = articles.owner) as owner, " +
         "title, " +
         "(SELECT display_name FROM games WHERE id = articles.game) as game, " +
-        "content, price, run_link, cover " +
+        "content, price, article_link, cover " +
         "FROM articles WHERE owner = (SELECT id FROM users WHERE username = $1) ORDER by id DESC";
     const result = (await client.query({
       text: sql,
@@ -177,14 +192,14 @@ router.get('/searchName', async (req, res) => {
  * Cette route permet d'ajouter un nouvel article/ article
  * Le body doit contenir l'id de l'utilisateur, le titre de la article, le jeu, le contenue, le prix, une image de couverture et le liens vers la video
  */
-router.post('/addrun', async (req, res) => {
-  const new_run = req.body;
+router.post('/addarticle', async (req, res) => {
+  const new_article = req.body;
   let id;
   try{
     id = (await client.query({
       text: "(SELECT id FROM games WHERE display_name = $1 LIMIT 1)",
       values: [
-        new_run.game,
+        new_article.game,
       ]
     })).rows[0].id;
   } catch (e) {
@@ -192,18 +207,18 @@ router.post('/addrun', async (req, res) => {
     return
   }
 
-  const sql_insert = "INSERT INTO articles (owner, title, game, content, price, cover, run_link) VALUES ($1, $2, $3, $4, $5, $6, $7)"
+  const sql_insert = "INSERT INTO articles (owner, title, game, content, price, cover, article_link) VALUES ($1, $2, $3, $4, $5, $6, $7)"
   try {
     await client.query({
       text: sql_insert,
       values: [
-          new_run.id_user,
-          new_run.title_run,
+          new_article.id_user,
+          new_article.title_article,
           id,
-          new_run.content_text,
-          new_run.price,
-          new_run.cover,
-          new_run.run_link
+          new_article.content_text,
+          new_article.price,
+          new_article.cover,
+          new_article.article_link
       ]
     });
     res.status(200).json({message: "ok"})
@@ -216,16 +231,16 @@ router.post('/addrun', async (req, res) => {
  * Cette route permet de modifier article/ article
  * Le body doit contenir l'id de l'utilisateur, le titre de la article, le jeu, le contenue, le prix, une image de couverture et le liens vers la video
  */
-router.patch('/runmodif', async (req, res) => {
+router.patch('/articlemodif', async (req, res) => {
   //on verifie la presence de la variable essentielle
   if (!req.body.id_user) {
     res.status(400).json({message: "bad request - request must contain an id"});
   }
   else {
-    const sql_update = "UPDATE articles set title = COALESCE($1, title), content = COALESCE($2, content), price = COALESCE($3, price), cover = COALESCE($4, cover), run_link = COALESCE($5, run_link) WHERE id=$6 AND owner=$7"
+    const sql_update = "UPDATE articles set title = COALESCE($1, title), content = COALESCE($2, content), price = COALESCE($3, price), cover = COALESCE($4, cover), article_link = COALESCE($5, article_link) WHERE id=$6 AND owner=$7"
     await client.query({
       text: sql_update,
-      values: [req.body.title_run, req.body.content_text, req.body.price, req.body.cover, req.body.run_link, req.body.id_article, req.body.id_user]
+      values: [req.body.title_article, req.body.content_text, req.body.price, req.body.cover, req.body.article_link, req.body.id_article, req.body.id_user]
     });
     res.status(200).json({message: "ok"});
   }
@@ -474,25 +489,26 @@ router.post('/addtobasket', async (req, res) => {
     res.status(400).json({message: "bad request "});
   }
   else {
-
     const sql = "SELECT * FROM basket WHERE id_user=$1 AND id_article=$2";
     const result = (await client.query({
       text: sql,
       values: [req.body.id_user,req.body.id_article]
     })).rows
     if (result.length === 1) {
-      const sql_update = "UPDATE basket set number = $1 WHERE id_user=$2 AND id_article=$2"
+      const sql_update = "UPDATE basket set number = $1 WHERE id_user=$2 AND id_article=$3"
       await client.query({
         text: sql_update,
-        values: [result.number +req.body.number ,req.body.id_user,req.body.id_article]
-      });
-    } else {
-      const sql_update = "INSERT INTO basket(id_article,id_user,number) VALUES ($1,$2,$3)"
-      await client.query({
-        text: sql_insert,
-        values: [result.number +req.body.number ,req.body.id_user,req.body.id_article]
+        values: [result[0].number +req.body.number ,req.body.id_user,req.body.id_article]
       });
     }
+    else {
+      const sql_update = "INSERT INTO basket(id_article,id_user,number) VALUES ($1,$2,$3)"
+      await client.query({
+        text: sql_update,
+        values: [req.body.id_article ,req.body.id_user,req.body.number]
+      });
+    }
+    res.status(200).json({message: "ok"})
   }
 })
 
@@ -508,19 +524,20 @@ router.delete('/delltobasket', async (req, res) => {
       values: [req.body.id_user,req.body.id_article]
     })).rows
     if (result.length === 1) {
-      if(result.number +req.body.number <=0){
-        const sql = "DELETE FROM basket  WHERE id_user=$2 AND id_article=$2"
+      if(result.number -req.body.number <=0){
+        const sql = "DELETE FROM basket  WHERE id_user=$1 AND id_article=$2"
         await client.query({
           text: sql,
           values: [req.body.id_user,req.body.id_article]
         });
       }else{
-        const sql_update = "UPDATE basket set number = $1 WHERE id_user=$2 AND id_article=$2"
+        const sql_update = "UPDATE basket set number = $1 WHERE id_user=$2 AND id_article=$3"
         await client.query({
           text: sql_update,
           values: [result.number -req.body.number ,req.body.id_user,req.body.id_article]
         });
-      }
+      }       res.status(200).json({message: "ok"})
+
 
     } else {
       res.status(400).json({message: "bad request "});
@@ -529,7 +546,7 @@ router.delete('/delltobasket', async (req, res) => {
 })
 
 router.delete('/order', async (req, res) => {
-  if (!req.body.id_user ) {
+  if (!req.session.userId ) {
     res.status(400).json({message: "bad request "});
   }
   else {
@@ -537,14 +554,16 @@ router.delete('/order', async (req, res) => {
     const sql = "SELECT * FROM basket WHERE id_user=$1 ";
     const result = (await client.query({
       text: sql,
-      values: [req.body.id_user]
+      values: [req.session.userId]
     })).rows
     if (result.length >= 1) {
-        const sql = "DELETE FROM basket  WHERE id_user=$2 "
+        const sql = "DELETE FROM basket  WHERE id_user=$1 "
         await client.query({
           text: sql,
-          values: [req.body.id_user]
+          values: [req.session.userId]
         });
+      res.status(200).json({message: "ok"})
+
 
     } else {
       res.status(400).json({message: "bad request "});

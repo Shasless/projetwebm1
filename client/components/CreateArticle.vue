@@ -6,27 +6,27 @@
     <hr style="max-width: 60%">
     <div class="body centered">
       <!-- Formulaire d'ajout -->
-      <form @submit.prevent="addRun">
-        <input v-model="newRun.title" placeholder="Titre" type="text" required class="h2 max_width centered_text">
+      <form @submit.prevent="addarticle">
+        <input v-model="newarticle.title" placeholder="Titre" type="text" required class="h2 max_width centered_text">
         <div class="form-group">
           <!-- Autocomplétion du jeu -->
           <div style="display: inline; position: relative">
-            <input type="text" v-model="newRun.game" placeholder="Jeu" required class="centered_text" @keydown.tab.prevent="autocomplete(0)" @input="autocompleteTimeOut" v-on:blur="hideAutocomplete()">
+            <input type="text" v-model="newarticle.game" placeholder="Jeu" required class="centered_text" @keydown.tab.prevent="autocomplete(0)" @input="autocompleteTimeOut" v-on:blur="hideAutocomplete()">
             <ul class="autocomplete left-aligned-text" v-if="autocomplete_possibilities.length > 0 && display_autocomplete">
               <li v-for="(auto, i) in autocomplete_possibilities" @click="autocomplete(i)">{{auto.display_name}}</li>
             </ul>
           </div>
           <small class="text-muted h4">-</small>
-          <input v-model="newRun.price" placeholder="prix" required type="text" class="centered_text" pattern="[0-9]+:[0-9][0-9]:[0-9][0-9]" title="La durée doit être au format hh:mm:ss" maxlength="20">
+          <input v-model="newarticle.price" placeholder="prix" required type="text" class="centered_text" pattern="[0-9]+:[0-9][0-9]:[0-9][0-9]" title="La durée doit être au format hh:mm:ss" maxlength="20">
         </div>
         <div class="form-group">
-          <textarea v-model="newRun.content" required placeholder="Décrivez votre article ou commentez la" class="max_width" rows="10"></textarea>
+          <textarea v-model="newarticle.content" required placeholder="Décrivez votre article ou commentez la" class="max_width" rows="10"></textarea>
         </div>
         <div class="form-group">
-          <input v-model="newRun.cover" type="url" required placeholder="Lien vers l'image de couverture" class="max_width">
+          <input v-model="newarticle.cover" type="url" required placeholder="Lien vers l'image de couverture" class="max_width">
         </div>
         <div class="form-group">
-          <input v-model="newRun.video_link" type="url" required placeholder="Lien vers la vidéo"  pattern=".*\.(youtube)\..*" title="L'URL doit être un lien youtube." class="max_width">
+          <input v-model="newarticle.video_link" type="url" required placeholder="Lien vers la vidéo"  pattern=".*\.(youtube)\..*" title="L'URL doit être un lien youtube." class="max_width">
         </div>
         <button v-if="user.admin || user.revendeur" class="btn btn-primary" type="submit">Ajouter</button>
         <button class="btn btn-danger" type="button" @click="reset()">Tout supprimer</button>
@@ -44,7 +44,7 @@
           email: null,
           username: null,
         },
-        newRun: {
+        newarticle: {
           video_link: '',
           cover: '',
           title: '',
@@ -73,13 +73,13 @@
       login() {
         window.location.hash = "#/login"
       },
-      addRun() {
-        this.$emit('add-article', this.newRun, this.user.id)
+      addarticle() {
+        this.$emit('add-article', this.newarticle, this.user.id)
       },
       reset () {
         // Réinitialise les champs de l'ajout d'article
         if(confirm("Voulez-vous vraiment supprimer ?")){
-          this.newRun = {
+          this.newarticle = {
             video_link: '',
             cover: '',
             title: '',
@@ -90,14 +90,14 @@
         }
       },
       async autocomplete (i) {
-        // Remplace le champ "this.newRun.game" d'entrée utilisateur par l'élément choisi dans la liste des suggestion.
+        // Remplace le champ "this.newarticle.game" d'entrée utilisateur par l'élément choisi dans la liste des suggestion.
         if (this.autocomplete_timer) {
           clearTimeout(this.autocomplete_timer);
           this.autocomplete_timer = null;
         }
         await this.reloadAutocomplete();
         try{
-          this.newRun.game = this.autocomplete_possibilities[i].display_name;
+          this.newarticle.game = this.autocomplete_possibilities[i].display_name;
           // On réinitialise les critères de recherche une fois celle-ci effectuée
           this.autocomplete_possibilities = [];
         } catch (e) {}
@@ -114,11 +114,11 @@
       },
       async reloadAutocomplete () {
         // Recharge les résultats d'autocomplétion depuis le serveur
-        if (this.newRun.game.length > 1){ // L'utilisateur doit avoir entré au moins 2 caractères pour que la recherche s'effectue
+        if (this.newarticle.game.length > 1){ // L'utilisateur doit avoir entré au moins 2 caractères pour que la recherche s'effectue
           this.autocomplete_possibilities = (await axios.get('/api/searchName', {
             params: {
               orderBy: "game",
-              searchString: this.newRun.game,
+              searchString: this.newarticle.game,
             }
           })).data
           this.display_autocomplete = true;

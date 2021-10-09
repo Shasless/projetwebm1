@@ -16,7 +16,7 @@ DB_PASSWORD|Mot de passe de la base de données
 ###### Exemple :
 ```
 SECRET="fjnjgs15sfzef15zEAzdad"
-DATABASE="projet_web_M1"
+DATABASE="projet_web_l3"
 DB_PASSWORD="superMotDePasse"
 ```
 # Exécution

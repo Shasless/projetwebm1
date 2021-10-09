@@ -19,7 +19,7 @@
                   <textarea  class="card-text form-control" v-model="editingArticle.content" rows="10" required></textarea>
                 </div>
                 <div class="form-group">
-                  <input class="width-20" v-model="editingArticle.run_link" required>
+                  <input class="width-20" v-model="editingArticle.article_link" required>
                 </div>
             </div>
           </div>
@@ -42,10 +42,10 @@
         </div>
         <div class="card" style="width: 40%; margin-left: 30%; ">
           <div class="embed-responsive embed-responsive-16by9" >
-            <iframe width="200" height="200" class="embed-responsive-item" v-bind:src="article.run_link" allowfullscreen></iframe>
+            <iframe width="200" height="200" class="embed-responsive-item" v-bind:src="article.article_link" allowfullscreen></iframe>
           </div>
         </div>
-        <button type="button" class="btn btn-primary">ajouter au panier</button>
+        <button type="button" class="btn btn-primary"  v-on:click="addtobasket(article.id)" >ajouter au panier</button>
         <!-- le bouton n'est accessible que si l'utilisateur est un admin ou le createur de la page-->
         <button v-if="!editingArticle.ver && (user.admin || user.revendeur && user.id == article.owner )" type="button" @click="editArticle()" class="btn btn-secondary">Editer</button>
         <button v-if="!editingArticle.ver && (user.admin || user.revendeur && user.id == article.owner)" type="button" @click="deleteArt()" class="btn btn-danger">Supprimer</button>
@@ -72,7 +72,7 @@ module.exports = {
       article: null,
       editingArticle: {
         ver: false,
-        run_link: '',
+        article_link: '',
         cover: '',
         title: '',
         game: '',
@@ -93,6 +93,10 @@ module.exports = {
     this.done = true
   },
   methods: {
+    addtobasket(idart) {
+      this.$emit('addtobasket', this.user.id, idart, 1)
+
+    },
     login() {
       window.location.hash = "#/login"
     },
@@ -127,7 +131,7 @@ module.exports = {
       if(confirm("Voulez-vous vraiment annuler vos modifications ?")) {
         this.editingArticle = {
           ver: false,
-          run_link: '',
+          article_link: '',
           cover: '',
           title: '',
           game: '',

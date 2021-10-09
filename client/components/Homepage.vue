@@ -35,7 +35,6 @@
                         <h2 class="card-title">{{article.title}} vendu par {{article.owner}}</h2>
                         <h4 class="text-muted">{{article.price}}€ - {{article.game}}</h4>
                         <p class="card-text p">{{formatContentPreview(article.content)}}</p>
-                        <button type="button" class="btn btn-primary">ajouter au panier</button>
 
                     </div>
                 </article>
@@ -85,6 +84,7 @@
             this.done = true
         },
         methods: {
+
             async getUser() {
                 const res = await axios.get('/api/me')
                 this.user = res.data

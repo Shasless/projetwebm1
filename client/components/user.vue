@@ -61,7 +61,7 @@
         </div>
       </div>
 
-      <!-- Affichage des runs -->
+      <!-- Affichage des articles -->
       <div>
         <div class="card-deck">
           <article v-for="article in articles" :key="article.id" class="card" v-bind:username="this.username" v-on:click="navigateArticle(article.id)">

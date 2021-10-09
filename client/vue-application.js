@@ -85,22 +85,22 @@ var app = new Vue({
       const res = await axios.get('/api/me')
       this.user = res.data
     },
-    async addRun (newRun, id_user) {
+    async addarticle (newarticle, id_user) {
       let video_embed;
       try {
         // on transforme un simple lien youtube en embed youtube
-        video_embed = newRun.video_link.split('/embed').join('');
+        video_embed = newarticle.video_link.split('/embed').join('');
         video_embed = video_embed.replace('watch?v=', '');
         video_embed = [video_embed.slice(0, 23), "/embed", video_embed.slice(23)].join('');
 
-        await axios.post('/api/addrun', {
+        await axios.post('/api/addarticle', {
           id_user: id_user,
-          title_run: newRun.title,
-          game: newRun.game,
-          content_text: newRun.content,
-          price: newRun.price,
-          cover: newRun.cover,
-          run_link: video_embed
+          title_article: newarticle.title,
+          game: newarticle.game,
+          content_text: newarticle.content,
+          price: newarticle.price,
+          cover: newarticle.cover,
+          article_link: video_embed
           })
         alert("Votre article a bien été publiée !")
         window.location.hash = "#/" //On renvoie l'utilisateur sur la page d'accueil
@@ -115,12 +115,40 @@ var app = new Vue({
       }
 
     },
-    async updateRun (newRun, id_user, id) {
+    async addtobasket ( id_user,id_article,number) {
       try {
-        let video_embed = newRun.run_link.split('/embed').join('')
+
+        await axios.post('/api/addtobasket', {
+          id_user: id_user,
+          id_article: id_article,
+          number: number
+
+        })
+        alert("Votre article a bien été ajouter au panier !")
+      } catch (e) { //Gestion des erreurs de l'API
+          alert("Une erreur est survenue lors de l'ajout, veuillez rééssayer.")
+      }
+
+    },async delltobasket (art, id_user) {
+      try {
+
+        await axios.post('/api/delltobasket', {
+          id_user: id_user,
+          id_article: art.id_article,
+          number: art.number
+
+        })
+      } catch (e) { //Gestion des erreurs de l'API
+        alert("Une erreur est survenue lors de la supretion, veuillez rééssayer.")
+      }
+
+    },
+    async updatearticle (newarticle, id_user, id) {
+      try {
+        let video_embed = newarticle.article_link.split('/embed').join('')
         video_embed = video_embed.replace('watch?v=', '');
         video_embed = [video_embed.slice(0, 23), "/embed", video_embed.slice(23)].join('');
-        await axios.patch('/api/runmodif', {id_user: id_user, title_run: newRun.title, content_text: newRun.content, price: newRun.price, cover:newRun.cover, run_link:video_embed, id_article: id})
+        await axios.patch('/api/articlemodif', {id_user: id_user, title_article: newarticle.title, content_text: newarticle.content, price: newarticle.price, cover:newarticle.cover, article_link:video_embed, id_article: id})
         alert("Vos mises à jour ont bien été prises en compte.")
         window.location.reload()
       }
