@@ -1,0 +1,52 @@
+<!-- programme par Enzo FILANGI et Adrien GIRARD du Groupe A-->
+
+<!doctype>
+<html lang="fr">
+
+    <head>
+        <meta charset="utf-8">
+        <title>Shop.game</title>
+        <!-- Load Vue followed by Vue Router -->
+        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/http-vue-loader/src/httpVueLoader.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/vue-router/dist/vue-router.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+        <!-- Load bootstrap -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    </head>
+    <body>
+        <div id="app">
+          <header>
+            <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                <h1 class="navbar-brand" ><router-link to='/' style="text-decoration: none; color: black"> Speed.article</router-link> </h1>
+                <router-link to='/create' v-if="user.admin || user.revendeur" class="nav-item nav-link">Ajouter un article</router-link>
+                <ul class="navbar-nav ml-auto">
+                    <li><router-link to='/register' class="nav-item nav-link" v-if="!user.id && done">S'enregistrer</router-link></li>
+                    <li><router-link to='/login' class="nav-item nav-link" v-if="!user.id && done">Se connecter</router-link></li>
+                    <li><router-link :to="`/user/${user.username}`"  style="text-decoration: none; color: black" class="stretched-link" v-if="user.username && done">Bonjour {{user.username}}  </router-link></li>
+                    <li><button @click="tobasket()" style="text-decoration: none; color: black; margin-left: 15px; border: none"  type="button" class="btn btn-light" class="stretched-link" v-if="user.username && done" class="text-muted" > acceder a votre panier!</button></li>
+                    <li><button @click="disconnect()" style="text-decoration: none; color: black; margin-left: 15px; border: none" class="stretched-link" v-if="user.username && done"><small class="text-muted">Se déconnecter</small></button></li>
+                </ul>
+            </nav>
+          </header>
+
+            <main>
+            <router-view
+              @register-user="registerUser"
+              @log-user="logUser"
+              @add-article="addarticle"
+              @update-article="updatearticle"
+              @delete-user="deleteUser"
+              @delete-article="deleteArticle"
+              @edit-user="editUser"
+              @addtobasket="addtobasket"
+              @delltobasket="delltobasket"
+            ></router-view>
+          </main>
+        </div>
+        <script src="/vue-application.js"></script>
+    </body>
+</html>
