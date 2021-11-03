@@ -30,7 +30,6 @@
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">New message</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
@@ -38,11 +37,11 @@
           <div class="modal-body">
             <form @submit.prevent="order">
               <div class="form-group">
-                <label for="recipient-name" type="email" v-model="email" class="col-form-label">Entrez votre adresse mail:</label>
-                <input type="text" class="form-control" id="recipient-name">
+                <label for="recipient-name" class="col-form-label">Entrez votre adresse mail:</label>
+                <input type="text" class="form-control" type="email" v-model="email" placeholder="Email" id="recipient-name">
               </div>
               <div class="modal-footer">
-                <button type="button" class="btn btn-primary" type="submit" >Send message</button>
+                <button class="btn btn-primary" type="submit" >Send message</button>
               </div>
             </form>
           </div>
@@ -63,20 +62,19 @@ module.exports = {
       articles: [], // Articles à afficher
       articlesk: [], // Articles à afficher
       cartTotal : 0,
-      showModal: false
-      email: ''
+      showModal: false,
+      email: "",
+      done : false
     }},
   async mounted() {
     try {
       await this.getUser()
-      this.articles = await this.getBasket()
-      this.articlesk = await this.getArticles()
-
-
-
     } catch (e) {
       this.login()
     }
+    this.articles = await this.getArticles()
+    console.log(this.articles)
+
     this.done = true
   },
   methods: {
@@ -120,7 +118,7 @@ module.exports = {
       const res = await axios.get('/api/me',)
       this.user = res.data
     },
-    async order() {
+    async order () {
       const res = await axios.delete('/api/order',{
         params: {
           mail: email,
@@ -137,7 +135,7 @@ module.exports = {
         }
       }).data
       await console.log(axios.get('/api/basket?id=8',).data)
-      await console.log(this.articles)
+
 
     },
     login() {
