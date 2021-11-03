@@ -72,7 +72,7 @@ router.get('/articles', async (req, res) => {
 router.get('/basket', async (req, res) => {
   try {
     const id = req.query.id;
-    const sql = ""; // add querry
+    const sql = "SELECT * FROM basket INNER JOIN articles ON basket.id_article = articles.id WHERE basket.id_user = $1"; // add querry
     const result = (await client.query({
       text: sql,
       values: [id]
@@ -550,6 +550,7 @@ router.delete('/order', async (req, res) => {
     res.status(400).json({message: "bad request "});
   }
   else {
+
 
     const sql = "SELECT * FROM basket WHERE id_user=$1 ";
     const result = (await client.query({
