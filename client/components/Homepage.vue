@@ -81,6 +81,7 @@
                 this.login()
             }
             this.articles = await this.getArticles()
+
             this.done = true
         },
         methods: {

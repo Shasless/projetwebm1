@@ -35,7 +35,7 @@
         <h3 class="card-header text-center">{{ article.title }}</h3>
         <div class="card-body">
           <div class="text-center">
-            <h4 class="card-subtitle mb-2 text-muted">{{article.price}} - {{article.game}}</h4>
+            <h4 class="card-subtitle mb-2 text-muted">{{article.price}}€  - {{article.game}}</h4>
             <button type="button" v-on:click="navigateuser(article.owner)" class="btn btn-link"> par {{ article.owner }}</button>
             <h5 class="card-text"> {{article.content}} </h5>
           </div>
