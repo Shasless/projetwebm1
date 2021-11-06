@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt')
 const { Client } = require('pg')
 
 const dotenv = require('dotenv')
+const {compare} = require("bcrypt");
 dotenv.config()
 
 const client = new Client({
@@ -71,8 +72,8 @@ router.get('/articles', async (req, res) => {
 
 router.get('/basket', async (req, res) => {
   try {
-    const id = req.query.id;
-    const sql = "SELECT * FROM basket INNER JOIN articles ON basket.id_article = articles.id WHERE basket.id_user = $1"; // add querry
+    const id = req.session.userId;
+    const sql = "SELECT * FROM basket INNER JOIN articles ON basket.id_article = articles.id WHERE basket.id_user = $1";
     const result = (await client.query({
       text: sql,
       values: [id]
@@ -513,31 +514,23 @@ router.post('/addtobasket', async (req, res) => {
 })
 
 router.delete('/delltobasket', async (req, res) => {
-  if (!req.body.id_user ) {
-    res.status(400).json({message: "bad request "});
+  if (!req.session.userId ) {
+    res.status(401).json({message: "bad request "});
   }
   else {
-
     const sql = "SELECT * FROM basket WHERE id_user=$1 AND id_article=$2";
     const result = (await client.query({
       text: sql,
-      values: [req.body.id_user,req.body.id_article]
+      values: [req.session.userId,req.query.id_article]
     })).rows
     if (result.length === 1) {
-      if(result.number -req.body.number <=0){
-        const sql = "DELETE FROM basket  WHERE id_user=$1 AND id_article=$2"
-        await client.query({
-          text: sql,
-          values: [req.body.id_user,req.body.id_article]
-        });
-      }else{
-        const sql_update = "UPDATE basket set number = $1 WHERE id_user=$2 AND id_article=$3"
-        await client.query({
-          text: sql_update,
-          values: [result.number -req.body.number ,req.body.id_user,req.body.id_article]
-        });
-      }       res.status(200).json({message: "ok"})
 
+      const sql2 = "DELETE FROM basket WHERE id_user=$1 AND id_article=$2"
+      const result2 =  await client.query({
+          text: sql2,
+          values: [result[0].id_user,result[0].id_article]
+        });
+         res.status(200).json({message: "ok"})
 
     } else {
       res.status(400).json({message: "bad request "});
@@ -547,10 +540,9 @@ router.delete('/delltobasket', async (req, res) => {
 
 router.delete('/order', async (req, res) => {
   if (!req.session.userId ) {
-    res.status(400).json({message: "bad request "});
+    res.status(401).json({message: "bad request "});
   }
   else {
-
 
     const sql = "SELECT * FROM basket WHERE id_user=$1 ";
     const result = (await client.query({
