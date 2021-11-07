@@ -15,6 +15,8 @@
           <h4 class="text-muted">{{article.price}}€ - Quantity {{article.number}}  Total: {{article.number*article.price}}</h4>
          </div>
         </div>
+        <button class="btn btn-success" @click="addOne(article.id)"> + </button>
+        <button class="btn btn-success" @click="delOne(article.id)"> - </button>
         <button class="btn btn-danger" @click="del(article.id)"> Supprimer </button>
 
       </article>
@@ -70,6 +72,19 @@ module.exports = {
     async getBasket() {
       return (await axios.get('/api/basket')).data
 
+    },   async delOne(id) {
+
+      this.$emit('addtobasket', this.user.id, id, -1)
+
+      this.$router.go()
+
+
+    },   async addOne(id) {
+      this.$emit('addtobasket', this.user.id, id, 1)
+      this.$router.go()
+
+
+
     },
     async del(id) {
       this.$router.go()
@@ -103,10 +118,11 @@ module.exports = {
   font-weight: bold;
 }
 .card img {
-  width: 15%;
+
   border-top-right-radius: 0;
   border-bottom-left-radius: calc(0.25rem - 1px);
   max-height: 12em;
+  min-height: 6em;
 }
 .centered {
   margin: 0 auto;

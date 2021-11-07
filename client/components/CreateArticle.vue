@@ -17,7 +17,7 @@
             </ul>
           </div>
           <small class="text-muted h4">-</small>
-          <input v-model="newarticle.price" placeholder="prix" required type="text" class="centered_text" pattern="[0-9]+:[0-9][0-9]:[0-9][0-9]" title="La durée doit être au format hh:mm:ss" maxlength="20">
+          <input v-model="newarticle.price" placeholder="prix" required type="text" class="centered_text"  maxlength="20">
         </div>
         <div class="form-group">
           <textarea v-model="newarticle.content" required placeholder="Décrivez votre article ou commentez la" class="max_width" rows="10"></textarea>

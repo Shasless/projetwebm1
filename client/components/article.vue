@@ -12,7 +12,7 @@
                   <input class="card-title h2" v-model="editingArticle.title" placeholder="Titre" required>
                 </div>
                 <div class="form-group">
-                  <input class="card-subtitle mb-2" v-model="editingArticle.price" placeholder="prix" pattern="[0-9]+:[0-9][0-9]:[0-9][0-9]" title="La durée doit être au format hh:mm:ss" maxlength="20" required>
+                  <input class="card-subtitle mb-2" v-model="editingArticle.price" placeholder="prix" maxlength="20" required>
                   <span>- {{editingArticle.game}}</span>
                 </div>
                 <div class="form-group">

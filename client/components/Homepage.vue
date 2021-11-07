@@ -28,15 +28,19 @@
 
             <!-- Affichage des articles -->
             <div class="card-deck">
-                <article v-for="article in articles" :key="article.id" class="card" v-on:click="navigateArticle(article.id)">
+                <article v-for="article in articles" :key="article.id" class="card" >
+                  <div v-on:click="navigateArticle(article.id)">
                     <img :src="article.cover" alt="cover image" class="image" v-if=article.cover>
                     <span class="card-img-top" v-else></span>
                     <div class="card-body">
                         <h2 class="card-title">{{article.title}} vendu par {{article.owner}}</h2>
                         <h4 class="text-muted">{{article.price}}€ - {{article.game}}</h4>
                         <p class="card-text p">{{formatContentPreview(article.content)}}</p>
+                    </div>
 
                     </div>
+                  <button type="button" class="btn btn-primary"  v-on:click="addtobasket(article.id)" >ajouter au panier</button>
+
                 </article>
             </div>
             <hr>
@@ -87,6 +91,10 @@
         },
         methods: {
 
+          addtobasket(idart) {
+            this.$emit('addtobasket', this.user.id, idart, 1)
+
+          },
             async getUser() {
                 const res = await axios.get('/api/me')
                 this.user = res.data
