@@ -496,11 +496,20 @@ router.post('/addtobasket', async (req, res) => {
       values: [req.body.id_user,req.body.id_article]
     })).rows
     if (result.length === 1) {
-      const sql_update = "UPDATE basket set number = $1 WHERE id_user=$2 AND id_article=$3"
-      await client.query({
-        text: sql_update,
-        values: [result[0].number +req.body.number ,req.body.id_user,req.body.id_article]
-      });
+      if(result[0].number +req.body.number>0){
+        const sql_update = "UPDATE basket set number = $1 WHERE id_user=$2 AND id_article=$3"
+        await client.query({
+          text: sql_update,
+          values: [result[0].number +req.body.number ,req.body.id_user,req.body.id_article]
+        });
+      }else{
+        const sql2 = "DELETE FROM basket WHERE id_user=$1 AND id_article=$2"
+        const result2 =  await client.query({
+          text: sql2,
+          values: [result[0].id_user,result[0].id_article]
+        });
+      }
+
     }
     else {
       const sql_update = "INSERT INTO basket(id_article,id_user,number) VALUES ($1,$2,$3)"
